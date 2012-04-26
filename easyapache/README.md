@@ -20,5 +20,5 @@ script, either through the WHM web interface or by running `/scripts/easyapache`
 to complete the installation.
 
 
-- [EA]: http://docs.cpanel.net/twiki/bin/view/EasyApache3/CustomMods
-- [cf]: https://www.cloudflare.com/wiki/Log_Files
+  [EA]: http://docs.cpanel.net/twiki/bin/view/EasyApache3/CustomMods
+  [cf]: https://www.cloudflare.com/wiki/Log_Files
