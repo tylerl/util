@@ -14,11 +14,25 @@ To use the build script, just run it like this;
 
     $ perl cloudflare.pl build
     ## This method will build a tar.gz package you can install elsewhere
+    ## For what do do with it, see http://docs.cpanel.net/twiki/bin/view/EasyApache3/CustomMods
     
-Once you've installed the easyapache component, re-run the easyapache build 
+Once you've installed the EasyApache component, re-run the EasyApache build 
 script, either through the WHM web interface or by running `/scripts/easyapache`
 to complete the installation.
 
-
   [EA]: http://docs.cpanel.net/twiki/bin/view/EasyApache3/CustomMods
   [cf]: https://www.cloudflare.com/wiki/Log_Files
+
+
+### Why not just install the apache module directly?
+
+While you could simply download the apache module directly and use `apxs` to install it,
+if you do so your server will break the next time you use the EasyApache tool to update 
+your Apache or PHP installation.  EasyApache starts out each time with a fresh, clean apache source tree. 
+This means that any changes or modules you've built will be wiped out. By incorporating your 
+module into the EasyApache build system, you guarantee that every time apache gets rebuilt, 
+your module will be included.
+
+Also, this mechanism is dramatically easier. Run this script to add "Mod CloudFlare" as a
+prompt in your EasyApache build system. Enable it by building with the module selected, disable
+it by building with it deselected. It couldn't be simpler.
