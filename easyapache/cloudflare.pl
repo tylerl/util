@@ -6,7 +6,7 @@
 # or alternately to simply install it locally.
 
 use Archive::Tar;
-use LWP::Simple;
+use LWP::UserAgent;
 use IO::Compress::Gzip qw(gzip) ;
 
 # Location from where to download the current version of mod_cloudflare
@@ -35,8 +35,10 @@ $MODE eq "install" and not ( -d $CPANEL_DIR ) and do {
 
 ######
 # Download latest version of the code
-$mod = get($DOWNLOAD_URL);
-$mod or die "Failed to download: [$DOWNLOAD_URL]";
+$ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 });
+$resp = $ua->get($DOWNLOAD_URL);
+$resp and $resp->is_success or die "Failed to download: [$DOWNLOAD_URL]";
+$mod = $resp->decoded_content;
 
 ######
 # Create the source code tar.gz
