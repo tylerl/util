@@ -10,4 +10,4 @@ those connections to 1.2.3.4 port 80.
 
 
 *Pre-built binaries for i386 and x86_64 can be found in the bin/ directory for people
-who do not have a `go` compiler handy.
+who do not have a `go` compiler handy.*

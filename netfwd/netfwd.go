@@ -21,7 +21,7 @@ import (
 
 func main() { 
 	if len(os.Args) != 3 { 
-		fatal("usage: netfwd local remote") 
+		fatal("%s","usage: netfwd local remote") 
 	} 
 	localAddr := os.Args[1] 
 	remoteAddr := os.Args[2] 
@@ -56,7 +56,7 @@ func forward(local net.Conn, remoteAddr string) {
 } 
 
 func fatal(s string, a ... interface{}) { 
-	fmt.Fprintf(os.Stderr, "netfwd: %s\n", fmt.Sprintf(s, a)) 
+	fmt.Fprintf(os.Stderr, "netfwd: " + s + "\n", a...) 
 	os.Exit(2) 
 } 
 
