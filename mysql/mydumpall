@@ -1,0 +1,197 @@
+#!/bin/bash
+
+# Dump mysql dbs to appropriately named .sql files
+# mysql args: [-u user] [-p password] [-h host] [-S socket] [-P port]
+#
+# All "long" args (starting with --) are passed to mysqldump only
+# Note that such args must not have separate parameters. So the
+# correct syntax would be --user=joe rather than --user joe
+#
+# If -R is *not* passed, then all non-option command-line arguments 
+# are database names to dump.
+#
+# If -R *is* passed, then all non-option command-line arguments are
+# regular expressions matched by bash against the list of database
+# names.  Expressions starting with ":" are negated,
+# meaning that databases matching will be filtered out. Filters are
+# processed in the order they appear on the command line. 
+#
+# Passing no database names or patterns, or no non-negated database
+# names or patterns implies that all database not explicitly excluded
+# should be *included*.
+#
+# e.g.
+#   mydumpall -S /tmp/mysql.socket :^mysql
+#		dumps all databases that don't start with "mysql" using provided socket
+#
+#   mydumpall ^my :^mysql$
+#		dumps databases starting with "my" except for "mysql"
+#
+#   mydumpall --complete-insert --no-create-info
+#		dump data only, and use "complete" inserts that don't rely on
+#		table order for correctness. Includes all tables.
+#
+#   mydumpall --single-transaction
+#       It's usually a good idea to dump as a single-transaction, it generally
+#       speeds things up.
+#
+
+
+#mysql args
+M_ARGS=
+#mysqldump args
+D_ARGS=
+ZIP=0
+TAR=0
+INDIR=0
+NAME="mysqldump_%Y%m%d_%H%M"
+PATMATCH=0
+
+while getopts :u:p:h:S:P:-:zZtf:Rd OPTION
+do
+	case $OPTION in 
+		R)
+			PATMATCH=1
+			;;
+		t)
+			TAR=1
+			;;
+		d)
+			INDIR=1
+			;;
+		f)
+			NAME=$OPTARG
+			;;
+		u)
+			M_ARGS="$M_ARGS -u$OPTARG"
+			D_ARGS="$D_ARGS -u$OPTARG"
+			;;
+		p)
+			M_ARGS="$M_ARGS -p$OPTARG"
+			D_ARGS="$D_ARGS -p$OPTARG"
+			;;
+		P)
+			M_ARGS="$M_ARGS -P$OPTARG"
+			D_ARGS="$D_ARGS -P$OPTARG"
+			;;
+		h)
+			M_ARGS="$M_ARGS -h$OPTARG"
+			D_ARGS="$D_ARGS -h$OPTARG"
+			;;
+		S)
+			M_ARGS="$M_ARGS -S$OPTARG"
+			D_ARGS="$D_ARGS -S$OPTARG"
+			;;
+		-)
+			D_ARGS="$D_ARGS --$OPTARG"
+			;;
+		z)
+			ZIP=1
+			;;
+		Z)
+			TAR=2
+			;;
+		?)
+			echo "$0 [-u user] [-p password] [-h host] [-S socket] [-P port] [-R] [-z] [-Z|-t|-d] [-f name] [--<mysqldump options>] [<db names>]" >&2
+			echo "    -R match using regular expressions"
+			echo "    -z gzip each SQL file" >&2
+			echo "    -Z zip the result into a (.zip file)"
+			echo "    -t tar(.gz) the result (tar.gz by default; .tar if used with -z)"
+			echo "    -d save files into a newly-created directory (ignored with -t)"
+			echo "    -f directory base name (used as format string to date(1); default \"$NAME\")"
+			exit 1
+			;;
+	esac
+done
+
+shift $(( $OPTIND -1 ))
+PATTERNS=$*
+
+#compute directory name
+NAME="`date +$NAME`"
+
+# remove archive suffixes
+if [[ ${NAME%.tar.gz} != $NAME ]] ; then NAME=${NAME%.tar.gz}
+elif [[ ${NAME%.zip} != $NAME ]] ; then NAME=${NAME%.zip}
+fi
+
+
+# Matches the DB in question with the provided patterns. Only matching DBs
+# are included. Matches based on BASH regular expressions.
+# return true(0) if DB should be discarded, false(1) if it should be included
+discard() {
+	DB=$1
+	DEFAULT=1 # No patterns = no reject
+	for PAT in $PATTERNS ; do
+		if [[ $PATMATCH == 1 ]] ; then
+			RET=1
+			if [ "${PAT:0:1}" == ":" ] ; then
+				RET=0
+				PAT=${PAT:1}
+			else 
+				DEFAULT=0 # if there are positive patterns, then default to reject
+			fi
+			[[ $DB =~ $PAT ]] && return $RET
+		else
+			DEFAULT=0
+			[[ $DB == $PAT ]] && return 1
+		fi
+	done
+	return $DEFAULT
+}
+
+die() {
+	echo "$*" >&2
+	exit 1
+}
+
+OLDDIR=$PWD
+if [[ $TAR != 0 ]] || [[ $INDIR != 0 ]]; then
+	#DIR="mysqldump_`date +%Y%m%d_%H%M`"
+	DIR=$NAME
+	if [[ -d $DIR ]] ; then
+		echo "Dir $DIR already exists!"
+		exit 1
+	fi
+	mkdir $DIR || die "Failed to create directory $DIR"
+	cd $DIR || die "Failed to change to directory $DIR"
+fi
+
+for DB in `echo show databases | mysql -B --skip-column-names $M_ARGS`; do
+	[[ $DB == "information_schema" ]] && continue
+	[[ -n "$PATTERNS" ]] && discard $DB && continue
+	echo $DB; 
+	if [ "$ZIP" == "1" ] ; then
+		mysqldump $DB $D_ARGS | gzip > $DB.sql.gz
+	else
+		mysqldump $DB $D_ARGS > $DB.sql
+	fi
+done
+
+if [[ $TAR != 0 ]] ; then
+	cd $OLDDIR
+	[[ -d $DIR ]] || die "Dir $DIR doesn't exist!"
+	
+	echo "Zipping the resulting dataset..."
+
+	if [[ $TAR == 2 ]] ; then
+		OUT="$DIR.zip"
+		cd $DIR
+		CMD="zip -r $OLDDIR/$DIR.zip ."
+		[[ $ZIP == 1 ]] && CMD="zip -r -0 $OLDDIR/$DIR.zip ."
+		$CMD
+		cd $OLDDIR
+	else
+		CMD="tar -zcf $DIR.tar.gz $DIR"
+		OUT="$DIR.tar.gz"
+		[[ $ZIP == 1 ]] && CMD="tar -cf $DIR.tar $DIR" && OUT="$DIR.tar"
+		$CMD
+	fi
+	echo "Removing source dir..."
+	rm -rf $DIR
+	echo "Finished. Result saved as $OUT"
+elif [[ $INDIR != 0 ]] ; then
+	cd $OLDDIR
+	echo "Finished. Result saved into $DIR"
+fi
+
