@@ -5,4 +5,4 @@ util
 
 * **netfwd** - simple TCP proxy written in Go
 
-* **mysql** - Scripts to simplify saving and loading MySQL databasees
+* **mysql** - Scripts to simplify saving and loading MySQL databases
