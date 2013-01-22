@@ -5,6 +5,7 @@ These scripts (currently only one) add support for additional apache modules to
 cPanel's [EasyApache][EA] build system.
 
 * **cloudflare.pl**: adds support for [mod_cloudflare][cf]
+* **reqtimeout.pl**: adds support for [mod_reqtimeout][rt]
 
 To use the build script, just run it like this;
 
@@ -22,7 +23,13 @@ to complete the installation.
 
   [EA]: http://docs.cpanel.net/twiki/bin/view/EasyApache3/CustomMods
   [cf]: https://www.cloudflare.com/wiki/Log_Files
+  [rt]: http://httpd.apache.org/docs/trunk/mod/mod_reqtimeout.html
 
+### But `mod_reqtimeout` is distributed with Apache! Why do I need this?
+
+Yeah. It's pretty annoying that cPanel hasn't included support for `mod_reqtimeout` in the build system.
+As soon as they start supporting it internally, `reqtimeout.pl` will become obsolete. You may be
+able to speed this process by pestering the cPanel developers. Good luck!
 
 ### Why not just install the apache module directly?
 
