@@ -51,14 +51,14 @@ gzip \$pkg_data => \$pkg_gzip or die;
 #######
 # Create the installation tar.gz
 $out_tar = Archive::Tar->new;
-$out_tar->add_data("Cpanel/Easy/mod_reqtimeout.pm.tar.gz",$pkg_gzip);
-$out_tar->add_data("Cpanel/Easy/mod_reqtimeout.pm",<<'END');
-package Cpanel::Easy::ModReqtimout;
+$out_tar->add_data("Cpanel/Easy/ModReqtimeout.pm.tar.gz",$pkg_gzip);
+$out_tar->add_data("Cpanel/Easy/ModReqtimeout.pm",<<'END');
+package Cpanel::Easy::ModReqtimeout;
 # Created by Tyler Larson
 our $easyconfig = {
     'version' => '$Rev: 1 $',
-    'name'    => 'mod_reqtimeout',
-    'note'    => 'Apache mod_reqtimeout support',
+    'name'    => 'Request Timeout Module [mod_reqtimeout]',
+    'note'    => 'Helps defend against "slowloris" denial of service attacks',
     'url'     => 'http://httpd.apache.org/docs/trunk/mod/mod_reqtimeout.html',
     'src_cd2' => 'mod_reqtimeout',
     'hastargz' => 1,
