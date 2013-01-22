@@ -51,8 +51,8 @@ gzip \$pkg_data => \$pkg_gzip or die;
 #######
 # Create the installation tar.gz
 $out_tar = Archive::Tar->new;
-$out_tar->add_data("Cpanel/Easy/ModReqtimeout.pm.tar.gz",$pkg_gzip);
-$out_tar->add_data("Cpanel/Easy/ModReqtimeout.pm",<<'END');
+$out_tar->add_data("Cpanel/Easy/mod_reqtimeout.pm.tar.gz",$pkg_gzip);
+$out_tar->add_data("Cpanel/Easy/mod_reqtimeout.pm",<<'END');
 package Cpanel::Easy::ModReqtimout;
 # Created by Tyler Larson
 our $easyconfig = {
