@@ -10,7 +10,7 @@ use LWP::UserAgent;
 use IO::Compress::Gzip qw(gzip) ;
 
 # Location from where to download the current version of mod_cloudflare
-$DOWNLOAD_URL="https://raw.github.com/cloudflare/CloudFlare-Tools/master/mod_cloudflare.c";
+$DOWNLOAD_URL="https://raw.github.com/cloudflare/mod_cloudflare/master/mod_cloudflare.c";
 
 # Location where to install on cpanel servers
 $CPANEL_DIR="/var/cpanel/easy/apache/custom_opt_mods";
@@ -50,6 +50,9 @@ gzip \$pkg_data => \$pkg_gzip or die;
 
 #######
 # Create the installation tar.gz
+
+# Note: http://goo.gl/Tu7hY redirects to https://support.cloudflare.com/entries/22055786-How-do-I-restore-original-visitor-IP-to-Apache-Web-Servers-
+
 $out_tar = Archive::Tar->new;
 $out_tar->add_data("Cpanel/Easy/ModCloudflare.pm.tar.gz",$pkg_gzip);
 $out_tar->add_data("Cpanel/Easy/ModCloudflare.pm",<<'END');
@@ -59,7 +62,7 @@ our $easyconfig = {
     'version' => '$Rev: 1 $',
     'name'    => 'Mod CloudFlare',
     'note'    => 'CloudFlare reverse proxy support',
-    'url'     => 'https://www.cloudflare.com/wiki/Log_Files',
+    'url'     => 'http://goo.gl/Tu7hY',
     'src_cd2' => 'mod_cloudflare',
     'hastargz' => 1,
     'step'    => {
