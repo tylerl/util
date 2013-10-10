@@ -6,6 +6,7 @@ cPanel's [EasyApache][EA] build system.
 
 * **cloudflare.pl**: adds support for [mod_cloudflare][cf]
 * **reqtimeout.pl**: adds support for [mod_reqtimeout][rt]
+* **rpaf.pl**: adds support for [mod_rpaf][rp]
 
 To use the build script, just run it like this;
 
@@ -24,6 +25,7 @@ to complete the installation.
   [EA]: http://docs.cpanel.net/twiki/bin/view/EasyApache3/CustomMods
   [cf]: https://www.cloudflare.com/wiki/Log_Files
   [rt]: http://httpd.apache.org/docs/trunk/mod/mod_reqtimeout.html
+  [rp]: http://www.stderr.net/apache/rpaf/
 
 ### But `mod_reqtimeout` is distributed with Apache! Why do I need this?
 
