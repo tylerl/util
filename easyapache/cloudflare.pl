@@ -10,7 +10,7 @@ use LWP::UserAgent;
 use IO::Compress::Gzip qw(gzip) ;
 
 # Location from where to download the current version of mod_cloudflare
-$DOWNLOAD_URL="https://raw.github.com/cloudflare/mod_cloudflare/master/mod_cloudflare.c";
+$DOWNLOAD_URL="https://raw.githubusercontent.com/cloudflare/mod_cloudflare/master/mod_cloudflare.c";
 
 # Location where to install on cpanel servers
 $CPANEL_DIR="/var/cpanel/easy/apache/custom_opt_mods";
