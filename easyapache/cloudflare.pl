@@ -7,6 +7,7 @@
 
 use Archive::Tar;
 use LWP::UserAgent;
+use LWP::Protocol:https;
 use IO::Compress::Gzip qw(gzip) ;
 
 # Location from where to download the current version of mod_cloudflare
